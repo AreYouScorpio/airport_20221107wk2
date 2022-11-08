@@ -2,10 +2,7 @@ package hu.webuni.airport.model;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -31,6 +28,9 @@ public class Flight {
 
     @ManyToOne
     private Airport landing;
+
+    @Column(name = "delay") //DB szinten csak delay legyen az oszlop neve
+    private Integer delayInSec;
 
 
 

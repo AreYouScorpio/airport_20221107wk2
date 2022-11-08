@@ -9,10 +9,12 @@ import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
+import hu.webuni.airport.aspect.LogCall;
 import hu.webuni.airport.model.QFlight;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -25,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@LogCall
 public class FlightService {
 
     // vagy autowired, vagy
@@ -38,6 +41,9 @@ public class FlightService {
     AirportRepository airportRepository;
     @Autowired
     FlightRepository flightRepository;
+
+    @Autowired
+    DelayService delayService;
 
     @Transactional
     public Flight save(Flight flight) {
@@ -92,6 +98,14 @@ public class FlightService {
 
         //return flightRepository.findAll(spec, Sort.by("id"));
         return Lists.newArrayList(flightRepository.findAll(ExpressionUtils.allOf(predicates)));
+    }
+
+
+    @Transactional //mert modosit a flight-okon
+    @Scheduled(cron="*/30 * * * * *")
+    public void updateDelays() {
+        System.out.println("updateDelays called");
+        flightRepository.findAll().forEach(flight -> flight.setDelayInSec(delayService.getDelay(flight.getId())));
     }
 
 }
