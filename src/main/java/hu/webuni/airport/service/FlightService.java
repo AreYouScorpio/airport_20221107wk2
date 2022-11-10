@@ -14,6 +14,7 @@ import hu.webuni.airport.model.QFlight;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -95,17 +96,40 @@ public class FlightService {
         }
 
 
-
         //return flightRepository.findAll(spec, Sort.by("id"));
         return Lists.newArrayList(flightRepository.findAll(ExpressionUtils.allOf(predicates)));
     }
 
+//      TOROLVE ES UJ IRVA
+    // -- vegul toroltuk, m hosszu a tranzakcio, lassu, a getDelay-ek miatt
+//    @Transactional //mert modosit a flight-okon
+//    @Scheduled(cron="*/30 * * * * *")
+//    public void updateDelays() {
+//        System.out.println("updateDelays called");
+//        flightRepository.findAll().forEach(flight -> flight.setDelayInSec(delayService.getDelay(flight.getId())));
+//    }
+// -----> az uj:
 
-    @Transactional //mert modosit a flight-okon
-    @Scheduled(cron="*/30 * * * * *")
+    //@Transactional //mert modosit a flight-okon -- vegul toroltuk, m hosszu a tranzakcio, lassu, a getDelay-ek miatt
+    @Scheduled(cron = "*/15 * * * * *")
+    //@Async //engedjuk raindulni a kov task-ot? debuggerben lathato threads-nel , enelkul csak scheduling-1 fut, ezzel pedig a task-1, task-2, stb raindul .. ha nem Asznc fut, csak a scheduling-1 szal fut
     public void updateDelays() {
         System.out.println("updateDelays called");
-        flightRepository.findAll().forEach(flight -> flight.setDelayInSec(delayService.getDelay(flight.getId())));
+        flightRepository.findAll().forEach(flight ->
+        {
+            flight.setDelayInSec(delayService.getDelay(flight.getId()));
+            flightRepository.save(flight);
+        });
+    }
+
+    @Scheduled(cron = "*/10 * * * * *")
+    public void dummy(){
+        try {
+            Thread.sleep(8000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("dummy called");
     }
 
 }
