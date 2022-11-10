@@ -4,6 +4,10 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledFuture;
 
 import com.google.common.collect.Lists;
 import com.querydsl.core.BooleanBuilder;
@@ -14,6 +18,7 @@ import hu.webuni.airport.model.QFlight;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -45,6 +50,11 @@ public class FlightService {
 
     @Autowired
     DelayService delayService;
+
+    @Autowired
+    TaskScheduler taskScheduler;
+
+    private Map<Long, ScheduledFuture<?>> delayPollerJobs = new ConcurrentHashMap<>(); // mert tobbszalon meghivodhat, ezert concurrent hashmap
 
     @Transactional
     public Flight save(Flight flight) {
@@ -111,25 +121,50 @@ public class FlightService {
 // -----> az uj:
 
     //@Transactional //mert modosit a flight-okon -- vegul toroltuk, m hosszu a tranzakcio, lassu, a getDelay-ek miatt
-    @Scheduled(cron = "*/15 * * * * *")
+    //@Scheduled(cron = "*/15 * * * * *") //15mpenkent
+    @Scheduled(cron = "0 0  * * * *") //minden oraban
     //@Async //engedjuk raindulni a kov task-ot? debuggerben lathato threads-nel , enelkul csak scheduling-1 fut, ezzel pedig a task-1, task-2, stb raindul .. ha nem Asznc fut, csak a scheduling-1 szal fut
     public void updateDelays() {
         System.out.println("updateDelays called");
         flightRepository.findAll().forEach(flight ->
         {
-            flight.setDelayInSec(delayService.getDelay(flight.getId()));
-            flightRepository.save(flight);
+            updateFlightWithDelay(flight);
         });
     }
 
-    @Scheduled(cron = "*/10 * * * * *")
-    public void dummy(){
-        try {
-            Thread.sleep(8000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println("dummy called");
+    private void updateFlightWithDelay(Flight flight) {
+        flight.setDelayInSec(delayService.getDelay(flight.getId()));
+        flightRepository.save(flight);
     }
+
+    //suritett pollozas inditas es leallitas
+    public void startDelayPollingForFlight(long flightId, long rate){ // cron helyett fixed rate scheduling lesz
+        ScheduledFuture<?> scheduledFuture = taskScheduler.scheduleAtFixedRate(() -> {
+            Optional<Flight> flightOptional = flightRepository.findById(flightId);
+            if (flightOptional.isPresent())
+                updateFlightWithDelay(flightOptional.get());
+        }, rate);
+        stopDelayPollingForFlight(flightId); // leallitani, nehogy meg egyet inditsunk ref nelkul, ha nem lett leallitva elozo
+        delayPollerJobs.put(flightId, scheduledFuture);
+    }
+
+    public void stopDelayPollingForFlight(long flightId){
+        ScheduledFuture<?> scheduledFuture = delayPollerJobs.get(flightId);
+        if(scheduledFuture!=null)
+            scheduledFuture.cancel(false); // ha epp futasban van, akarjuk-e megszakitani, azt nem akarjuk
+    }
+
+
+//    // dummy :)
+//    @Scheduled(cron = "*/10 * * * * *")
+//    public void dummy(){
+//        try {
+//            Thread.sleep(8000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        System.out.println("dummy called");
+//    }
+
 
 }

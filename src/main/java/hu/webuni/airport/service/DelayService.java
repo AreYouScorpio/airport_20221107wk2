@@ -12,11 +12,12 @@ public class DelayService {
     //szimulaljuk, h ez egy hosszabb lekerdezes, pl egy partner rendszert hivunk, ahol live adatok vannak a repulesrol, egy hosszan tarto muvelet
     public int getDelay(long flightId) {
         System.out.println("getDelay called");
-        try {
-            Thread.sleep(5000);
-        }
-        catch (InterruptedException e) {
-        }
+//        try {
+//            Thread.sleep(5000);
+//        }
+//        catch (InterruptedException e) {
+//        }
+        //nem akarunk 5mp kesleltetest, az igeny szerinti scheduling inditas es leallitas beallitasahoz
         return random.
                 nextInt(0, 1800);
     }

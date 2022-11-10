@@ -53,4 +53,14 @@ public class FlightController {
         return flightMapper.flightsToDtos(flightRepository.findAll(predicate));
     }
 
+    @PostMapping("/{flightId}/pollDelay/{rate}")
+    public void startDelayPolling(@PathVariable long flightId, @PathVariable long rate) { //uj timert hoz letre, letrehozo jellegu, postmapping emiatt
+        flightService.startDelayPollingForFlight(flightId, rate);
+    }
+
+    @DeleteMapping("/{flightId}/pollDelay")
+    public void startDelayPolling(@PathVariable long flightId) { //torol egy timert
+        flightService.stopDelayPollingForFlight(flightId);
+    }
+
 }
