@@ -3,11 +3,14 @@ package hu.webuni.airport.service;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
+import hu.webuni.airport.model.A;
 import hu.webuni.airport.model.Airport;
 import hu.webuni.airport.model.Flight;
 import hu.webuni.airport.model.QFlight;
 import hu.webuni.airport.repository.AirportRepository;
 import hu.webuni.airport.repository.FlightRepository;
+import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.query.AuditEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.Access;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -30,6 +35,8 @@ public class AirportService {
     FlightRepository flightRepository;
     LogEntryService logEntryService; // ide hoztuk át a controllerből,de nem autowired, hanem új constructorral a háromra
 
+    @PersistenceContext //ezzel injektalom
+    private EntityManager em; //AuditReader-nek kell EntityManager
     public AirportService(AirportRepository airportRepository, FlightRepository flightRepository, LogEntryService logEntryService) {
         this.airportRepository = airportRepository;
         this.flightRepository = flightRepository;
@@ -255,5 +262,16 @@ public class AirportService {
         return airports; // igy nem 100x100 jon be, igaz nem egy, hanem 2 queryvel, de igy csak 100+100 jon vissza
     }
 
+    @Transactional //envers-es lekerdezes tranzakcionalis kell legyen
+    @SuppressWarnings({"rawtypes", "unchecked"}) //a tipusparam nelkuli list miatt .. es h typesafety .. ezeket a warningokat kikapcsoljuk
+    public List<Airport> getAirportHistory(long id) {
+        List resultList = AuditReaderFactory.get(em)//az envers generikusokat nem hasznal, tipusparameter nelkuli listet ad vissza
+                .createQuery()
+                .forRevisionsOfEntity(Airport.class, true, true) // csak az entitasokat akarom-e (ha false, akk a revision-oket is)/ a torolt sorokat is akarom-e latni
+                .add(AuditEntity.property("id").eq(id)) //"id"-re szeretnek szurni, ez legyen egyenlo a parameter id-vel
+                .getResultList();
+
+        return resultList;
+    }
 
 }

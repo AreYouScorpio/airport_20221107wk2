@@ -90,6 +90,19 @@ public class AirportController {
     }
 
 
+    @GetMapping("/{id}/history")
+    public List<AirportDto> getHistoryById(@PathVariable long id) {
+        Airport airport = airportService.findById(id)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        List<Airport> airports = airportService.getAirportHistory(id);
+
+        return airportMapper.airportSummariesToDtos(airports);
+    }
+
+
+
+
     @PostMapping
     public AirportDto createAirport(@RequestBody @Valid AirportDto airportDto /*, BindingResult errors */) {
         //if (errors.hasErrors()) throw new ...
