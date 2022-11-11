@@ -3,13 +3,12 @@ package hu.webuni.airport.service;
 import com.google.common.collect.Lists;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
-import hu.webuni.airport.model.A;
-import hu.webuni.airport.model.Airport;
-import hu.webuni.airport.model.Flight;
-import hu.webuni.airport.model.QFlight;
+import hu.webuni.airport.model.*;
 import hu.webuni.airport.repository.AirportRepository;
 import hu.webuni.airport.repository.FlightRepository;
 import org.hibernate.envers.AuditReaderFactory;
+import org.hibernate.envers.DefaultRevisionEntity;
+import org.hibernate.envers.RevisionType;
 import org.hibernate.envers.query.AuditEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -264,12 +263,26 @@ public class AirportService {
 
     @Transactional //envers-es lekerdezes tranzakcionalis kell legyen
     @SuppressWarnings({"rawtypes", "unchecked"}) //a tipusparam nelkuli list miatt .. es h typesafety .. ezeket a warningokat kikapcsoljuk
-    public List<Airport> getAirportHistory(long id) {
+    //public List<Airport> getAirportHistory(long id) {  ---> HistoryData bevezetesevel atirjuk
+    public List<HistoryData<Airport>> getAirportHistory(long id) {
+
+        //ez nem airport listat ad vissza, hanem 3elemu object tombot: 1)entitas 2)revision info 3)revision type !!! -> ezert stream es map is kell es egy osztalyt csinalunk, HistoryData-t
         List resultList = AuditReaderFactory.get(em)//az envers generikusokat nem hasznal, tipusparameter nelkuli listet ad vissza
                 .createQuery()
-                .forRevisionsOfEntity(Airport.class, true, true) // csak az entitasokat akarom-e (ha false, akk a revision-oket is)/ a torolt sorokat is akarom-e latni
+                .forRevisionsOfEntity(Airport.class, false, true) // csak az entitasokat akarom-e (ha false, akk a revision-oket is)/ a torolt sorokat is akarom-e latni
                 .add(AuditEntity.property("id").eq(id)) //"id"-re szeretnek szurni, ez legyen egyenlo a parameter id-vel
-                .getResultList();
+                .getResultList()
+                .stream()
+                .map(o -> {
+                    Object[] objArray = (Object[])o; // castoljuk az object tombre
+                    DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) objArray[1];
+                    return new HistoryData<Airport>(
+                            (Airport) objArray[0],
+                            (RevisionType) objArray[2],
+                            revisionEntity.getId(),
+                            revisionEntity.getRevisionDate()
+                    );
+                }).toList();
 
         return resultList;
     }

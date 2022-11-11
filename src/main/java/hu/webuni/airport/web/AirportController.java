@@ -3,6 +3,7 @@ package hu.webuni.airport.web;
 import hu.webuni.airport.dto.AirportDto;
 import hu.webuni.airport.mapper.AirportMapper;
 import hu.webuni.airport.model.Airport;
+import hu.webuni.airport.model.HistoryData;
 import hu.webuni.airport.repository.AirportRepository;
 import hu.webuni.airport.service.AirportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,26 +44,25 @@ public class AirportController {
         // eredetileg ennyi: return airportMapper.airportsToDtos(airportService.findAll());
         // de most kíváncsiak vagyunk, mi toltodik be mar automatikusan DB-bol
         //List<Airport> airports = airportService.findAll(); //--> ehelyett meg a repobol mar az uj lekerest hivjuk meg es nem a service-bol, igy gyorsabb, ugyis csak athivna
-            // tesztelesnek volt ez:
-            // List<Airport> airports = airportRepository.findAll();
+        // tesztelesnek volt ez:
+        // List<Airport> airports = airportRepository.findAll();
 
         List<Airport> airports =
                 isFull
 
 //                ? airportRepository.findAllWithAddressAndDepartures()  // ez N*M sort küldene vissza, ha N arrival es M departure van, ezert inkabb airportservice findallwithrelationshipet irunk
-                    ? airportService.findaAllWithRelationships(pageable)
+                        ? airportService.findaAllWithRelationships(pageable)
                         : airportRepository.findAll(pageable).getContent(); // ezt atallitjuk lazy-re Airportban - @ManyToOne(fetch=FetchType.LAZY)
 //getContent kell h lista legyen, m a Page of Entity, entitas egy oldalat adna vissza, plusz csomo mas infot, pl hogy hany db van osszesen, stb, ezert kell csak ez a content
 
         // es mi akkor kenyszerul betoltodni, amikor a mapstruct mar a gettereket hivogatja:
 
-            // tesztelesnek volt ez: return airportMapper.airportsToDtos(airports);
+        // tesztelesnek volt ez: return airportMapper.airportsToDtos(airports);
 
 
         return isFull
                 ? airportMapper.airportsToDtos(airports) // full
                 : airportMapper.airportSummariesToDtos(airports); // "summary" verzio
-
 
 
     }
@@ -71,7 +71,7 @@ public class AirportController {
     @GetMapping("/{id}")
     public AirportDto getById(@PathVariable long id) {
         Airport airport = airportService.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // deleted after mapper ---> AirportDto airportDto = airports.get(id);
 //        if (airportDto!=null)
@@ -91,16 +91,27 @@ public class AirportController {
 
 
     @GetMapping("/{id}/history")
-    public List<AirportDto> getHistoryById(@PathVariable long id) {
+    public List<HistoryData<AirportDto>> getHistoryById(@PathVariable long id) {
         Airport airport = airportService.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        List<Airport> airports = airportService.getAirportHistory(id);
+        //List<Airport> airports = airportService.getAirportHistory(id);
+        List<HistoryData<Airport>> airports = airportService.getAirportHistory(id);
 
-        return airportMapper.airportSummariesToDtos(airports);
+        List<HistoryData<AirportDto>> airportDtosWithHistory = new ArrayList<>();
+
+        airports.forEach(airportHistoryData -> {
+            airportDtosWithHistory.add(new HistoryData<>(
+                    airportMapper.airportSummaryToDto(airportHistoryData.getData()),
+                    airportHistoryData.getRevType(),
+                    airportHistoryData.getRevision(),
+                    airportHistoryData.getDate()
+            ));
+        });
+
+
+        return airportDtosWithHistory;
     }
-
-
 
 
     @PostMapping
@@ -186,15 +197,10 @@ new PutMapping after MapStruct added:
 
 
             return ResponseEntity.ok(savedAirportDto);
-        }
-        catch (NoSuchElementException e) {
+        } catch (NoSuchElementException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
     }
-
-
-
-
 
 
 }
