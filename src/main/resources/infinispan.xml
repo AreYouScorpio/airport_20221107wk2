@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Hibernate, Relational Persistence for Idiomatic Java
+  ~
+  ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later.
+  ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<infinispan
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="urn:infinispan:config:12.1 https://infinispan.org/schemas/infinispan-config-12.1.xsd"
+        xmlns="urn:infinispan:config:12.1">
+
+
+    <cache-container name="SpringCacheManager">
+        <local-cache name="pagedAirportsWithRelationships">
+            <transaction mode="NONE" />
+            <expiration max-idle="10000" interval="2000"/>
+<!--            max idle 10mp es ezt 2mp-enkent ellenorizze-->
+            <memory max-count="10000"/>
+        </local-cache>
+    </cache-container>
+
+</infinispan>
