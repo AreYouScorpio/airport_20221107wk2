@@ -102,7 +102,8 @@ public class AirportController {
 
         airports.forEach(airportHistoryData -> {
             airportDtosWithHistory.add(new HistoryData<>(
-                    airportMapper.airportSummaryToDto(airportHistoryData.getData()),
+                    //airportMapper.airportSummaryToDto(airportHistoryData.getData()), ---kapcs betolteshez teszteljuk--->
+                    airportMapper.airportToDto(airportHistoryData.getData()),
                     airportHistoryData.getRevType(),
                     airportHistoryData.getRevision(),
                     airportHistoryData.getDate()

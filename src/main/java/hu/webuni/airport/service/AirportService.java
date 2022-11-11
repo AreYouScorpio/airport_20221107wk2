@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import javax.persistence.Access;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.JoinType;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
@@ -271,13 +272,18 @@ public class AirportService {
                 .createQuery()
                 .forRevisionsOfEntity(Airport.class, false, true) // csak az entitasokat akarom-e (ha false, akk a revision-oket is)/ a torolt sorokat is akarom-e latni
                 .add(AuditEntity.property("id").eq(id)) //"id"-re szeretnek szurni, ez legyen egyenlo a parameter id-vel
+                //.traverseRelation("address", JoinType.LEFT)//javax.persistence.criteria-s jointype // minden kapcs nem toltodik be ehhez, ha forRevisionsOfEntity kezdodik
                 .getResultList()
                 .stream()
                 .map(o -> {
                     Object[] objArray = (Object[])o; // castoljuk az object tombre
                     DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) objArray[1];
+                    Airport airport = (Airport) objArray[0];
+                    System.out.println(airport.getAddress().getCity()); //airport.getAddress() onmagaban nem kenyszeriti ki a kapcs betoltest, csak ha meg vmit meghivok rajta, pl getCity
+                    System.out.println(airport.getArrivals().size()); //szinten vmit csin kell vele, pl lekerdezem a meretet
+                    System.out.println(airport.getDepartures().size());
                     return new HistoryData<Airport>(
-                            (Airport) objArray[0],
+                            airport,
                             (RevisionType) objArray[2],
                             revisionEntity.getId(),
                             revisionEntity.getRevisionDate()
