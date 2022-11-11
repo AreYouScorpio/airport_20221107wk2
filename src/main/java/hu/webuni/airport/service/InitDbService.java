@@ -11,6 +11,7 @@ import hu.webuni.airport.repository.FlightRepository;
 import hu.webuni.airport.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,6 +34,9 @@ public class InitDbService {
     AddressRepository addressRepository;
     @Autowired
     FlightRepository flightRepository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     public InitDbService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         //super();
@@ -62,6 +66,13 @@ public class InitDbService {
         airportRepository.deleteAll();
         addressRepository.deleteAll();
         //sorrend fontos, m flight hivatkozik airportra, airport pedig az address-re
+    }
+
+    @Transactional
+    public void deleteAudTables() { //csak native query tudja torolni, m Aud tablakra nincs entitas
+        jdbcTemplate.update("delete from address_aud");
+        jdbcTemplate.update("delete from airport_aud");
+        jdbcTemplate.update("delete from flight_aud");
     }
 
     @Transactional

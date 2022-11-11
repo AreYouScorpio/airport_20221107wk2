@@ -157,7 +157,8 @@ new PutMapping after MapStruct added:
 
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority('admin')") //ez csak akkor értékelődik ki, ha a SecurityConfigban megkérem @EnableGlobalMethodSecurityben
+    //Aud-hoz most kikapcsoltam a securityt
+    //@PreAuthorize("hasAuthority('admin')") //ez csak akkor értékelődik ki, ha a SecurityConfigban megkérem @EnableGlobalMethodSecurityben
     public ResponseEntity<AirportDto> modifyAirport(@PathVariable long id,
                                                     @RequestBody AirportDto airportDto) {
 
