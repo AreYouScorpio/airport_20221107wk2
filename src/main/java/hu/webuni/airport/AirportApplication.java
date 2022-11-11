@@ -8,12 +8,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 
 @RequiredArgsConstructor
 //@SpringBootApplication
 //ha security nélkül akarjuk futtatni:
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)
+@EnableCaching
 public class AirportApplication implements CommandLineRunner{
 
 	@Autowired

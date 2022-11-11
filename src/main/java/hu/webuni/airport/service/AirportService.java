@@ -9,6 +9,7 @@ import hu.webuni.airport.model.QFlight;
 import hu.webuni.airport.repository.AirportRepository;
 import hu.webuni.airport.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -242,6 +243,7 @@ public class AirportService {
      */
 
     @Transactional // ha transactional akk nem kell atmasolgatni egyiket a masikba a ket listanal, elintez helyettunk mindent a hybernate az egy kozos perzisztencia kontextus miatt
+    @Cacheable("pagedAirportsWithRelationships")  //springes !!, ehhez kell @enablecaching, de azt tehetjuk kulon config osztaly helyett magara az appra is, m az is egy configuration
     public List<Airport> findaAllWithRelationships(Pageable pageable) {
         List<Airport> airports = airportRepository.findAllWithAddressAndDepartures(pageable);
         airports = airportRepository.findAllWithAddress(pageable);

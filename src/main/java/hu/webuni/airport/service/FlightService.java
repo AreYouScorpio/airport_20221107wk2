@@ -125,8 +125,9 @@ public class FlightService {
     //@Scheduled(cron = "*/15 * * * * *") //15mpenkent
     //@Scheduled(cron = "0 0  * * * *") //minden oraban - ez a fixedrate pollinghoz volt
     //@Scheduled(cron = "0 0  * * * *") //minden oraban - ez volt a polling start/stop elso verziohoz
-    @Scheduled(cron = "*/5 * * * * *") //
-    @SchedulerLock(name = "updateDelays") // schedLock annotacio, fusson, de csak ha az updateDelays nevu lock, ami mar DB-ben van, nem foglalt, ill ertelemszeruen foglalja le, ha meg nincs lefoglalva
+    //az alabbi ket scheduled beallitast a cache-hez kikapcsoljuk, ne firkalja tele a consolet:
+    //@Scheduled(cron = "*/5 * * * * *") //
+    //@SchedulerLock(name = "updateDelays") // schedLock annotacio, fusson, de csak ha az updateDelays nevu lock, ami mar DB-ben van, nem foglalt, ill ertelemszeruen foglalja le, ha meg nincs lefoglalva
     //@Async //engedjuk raindulni a kov task-ot? debuggerben lathato threads-nel , enelkul csak scheduling-1 fut, ezzel pedig a task-1, task-2, stb raindul .. ha nem Asznc fut, csak a scheduling-1 szal fut
     public void updateDelays() {
         System.out.println("updateDelays called");
