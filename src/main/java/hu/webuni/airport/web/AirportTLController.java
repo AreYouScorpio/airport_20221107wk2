@@ -1,8 +1,9 @@
 package hu.webuni.airport.web;
 
-import hu.webuni.airport.dto.AddressDto;
-import hu.webuni.airport.dto.AirportDto;
-import hu.webuni.airport.dto.FlightDto;
+import hu.webuni.airport.api.model.AddressDto;
+import hu.webuni.airport.api.model.AirportDto;
+import hu.webuni.airport.api.model.AirportDto;
+import hu.webuni.airport.api.model.FlightDto;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -44,7 +44,6 @@
         </dependency>
 
 
-
         <dependency>
             <groupId>org.infinispan</groupId>
             <artifactId>infinispan-hibernate-cache-v53</artifactId>
@@ -130,6 +129,25 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
+        <!--        az openapi generator a generalt dto-kat telepakolta @Json annotaciokkal, nem torolgetjuk ki, hanem hogy ertelmezni tudja, hozzaadjuk ezt, de a regebbi 1.6.4.-et-->
+        <!--kell a jackson-databind-nullable is-->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.4</version>
+        </dependency>
+        <!--        es akkor ez is, ebbol a legfrissebb-->
+        <!-- https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.4</version>
+            <!--            tanare a 0.2.2.-->
+        </dependency>
+
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
@@ -156,7 +174,7 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.5.6</version>
         </dependency>
-
+        <!--        localhost:8080/v3/api-docs.yaml  .. itt lesz megtalalhato -->
     </dependencies>
 
     <build>
@@ -167,40 +185,37 @@
                 <version>${project.parent.version}</version>
             </plugin>
 
-<!-- new compiler plugin block for solving lombok-mapstruct-binding-->
+            <!-- new compiler plugin block for solving lombok-mapstruct-binding-->
 
             <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-            <annotationProcessorPaths>
-            <path>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-processor</artifactId>
-                <version>${org.mapstruct.version}</version>
-            </path>
-            <path>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>${lombok.version}</version>
-            </path>
-                <path>
-                    <groupId>org.projectlombok</groupId>
-                    <artifactId>lombok-mapstruct-binding</artifactId>
-                    <version>0.2.0</version>
-                </path>
-                <!-- other annotation processors -->
-                <path>
-                    <groupId>org.hibernate</groupId>
-                    <artifactId>hibernate-jpamodelgen</artifactId>
-                    <version>5.6.3.Final</version>
-                </path>
-            </annotationProcessorPaths>
-            </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                        <!-- other annotation processors -->
+                        <path>
+                            <groupId>org.hibernate</groupId>
+                            <artifactId>hibernate-jpamodelgen</artifactId>
+                            <version>5.6.3.Final</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
-
-
-
 
 
             <plugin>
@@ -226,6 +241,45 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <!-- RELEASE_VERSION -->
+                <version>6.2.1</version>
+                <!--                5.3.1. tanar verzioja-->
+                <!-- /RELEASE_VERSION -->
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/openapi/airport-openapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <configOptions>
+                                <!--                                <sourceFolder>src/gen/java/main</sourceFolder> nem definialjuk felul, jo lesz a default-->
+                                <!--                                viszont egyeb opciokat tegyunk be:-->
+                                <!--                                a tagek neve legyen a metodus, amibe csomagolodik majd, TRUE-->
+                                <useTags>true</useTags>
+                                <!--                                datumformatum hasznalja a java8-as tipusokat-->
+                                <dateLibrary>java8-localdatetime</dateLibrary>
+                                <!--                                sima java8 offsetet hasznalna, -localdatetime eseten nem kell majd konvertalgatni az entitasok es a dto-k kozott-->
+                                <configPackage>hu.webuni.airport.api.config</configPackage>
+                                <!--                                csak interface-eket szeretnenk generaltatni: -->
+                                <interfaceOnly>true</interfaceOnly>
+                            </configOptions>
+                            <!--                            ez a ketto a configOptions-on kivulre keruljon ! : -->
+                            <!--                                a controller interface ide kerul az api-ba:-->
+                            <apiPackage>hu.webuni.airport.api</apiPackage>
+                            <!--                                a vegpontok adattipusa generalodik majd bele, amit hasznalnak a vegpontok, esetunkben Dto-k-->
+                            <modelPackage>hu.webuni.airport.api.model</modelPackage>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+
         </plugins>
     </build>
 

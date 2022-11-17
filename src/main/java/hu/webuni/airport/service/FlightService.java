@@ -153,11 +153,11 @@ public class FlightService {
         delayPollerJobs.put(flightId, scheduledFuture);
     }
 
-    public void stopDelayPollingForFlight(long flightId){
-        ScheduledFuture<?> scheduledFuture = delayPollerJobs.get(flightId);
-        if(scheduledFuture!=null)
-            scheduledFuture.cancel(false); // ha epp futasban van, akarjuk-e megszakitani, azt nem akarjuk
-    }
+        public void stopDelayPollingForFlight(long flightId){
+            ScheduledFuture<?> scheduledFuture = delayPollerJobs.get(flightId);
+            if(scheduledFuture!=null)
+                scheduledFuture.cancel(false); // ha epp futasban van, akarjuk-e megszakitani, azt nem akarjuk
+        }
 
 
 //    // dummy :)

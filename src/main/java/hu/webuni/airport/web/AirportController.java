@@ -1,6 +1,6 @@
 package hu.webuni.airport.web;
 
-import hu.webuni.airport.dto.AirportDto;
+import hu.webuni.airport.api.model.AirportDto;
 import hu.webuni.airport.mapper.AirportMapper;
 import hu.webuni.airport.model.Airport;
 import hu.webuni.airport.model.HistoryData;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -37,8 +36,8 @@ public class AirportController {
     //LogEntryService logEntryService;
 
     @GetMapping
-    public List<AirportDto> getAll(@RequestParam Optional<Boolean> full,
-                                   @SortDefault("id") Pageable pageable) { // szabalyozzuk h az osszeset kerjuk, addresst is // a sima web vegu kell a SortDefault-bol, nem a masik sortdefault-os, m az oldalaknal nem garantalna semmi, h sorban jon minden, ha nem lenne sorrend, 2x is lehetne uaz
+    public List<hu.webuni.airport.api.model.AirportDto> getAll(@RequestParam Optional<Boolean> full,
+                                                               @SortDefault("id") Pageable pageable) { // szabalyozzuk h az osszeset kerjuk, addresst is // a sima web vegu kell a SortDefault-bol, nem a masik sortdefault-os, m az oldalaknal nem garantalna semmi, h sorban jon minden, ha nem lenne sorrend, 2x is lehetne uaz
         boolean isFull = full.orElse(false);
 
         // eredetileg ennyi: return airportMapper.airportsToDtos(airportService.findAll());
@@ -69,7 +68,7 @@ public class AirportController {
 
 
     @GetMapping("/{id}")
-    public AirportDto getById(@PathVariable long id) {
+    public hu.webuni.airport.api.model.AirportDto getById(@PathVariable long id) {
         Airport airport = airportService.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -116,7 +115,7 @@ public class AirportController {
 
 
     @PostMapping
-    public AirportDto createAirport(@RequestBody @Valid AirportDto airportDto /*, BindingResult errors */) {
+    public hu.webuni.airport.api.model.AirportDto createAirport(@RequestBody @Valid AirportDto airportDto /*, BindingResult errors */) {
         //if (errors.hasErrors()) throw new ...
 
 
@@ -190,7 +189,7 @@ new PutMapping after MapStruct added:
         Airport airport = airportMapper.dtoToAirport(airportDto);
         airport.setId(id); // hogy tudjunk módosítani azonos iata-jút a uniqecheck ellenére
         try {
-            AirportDto savedAirportDto = airportMapper.airportToDto(airportService.update(airport));
+            hu.webuni.airport.api.model.AirportDto savedAirportDto = airportMapper.airportToDto(airportService.update(airport));
 
             // LogEntryRepository.save(new LogEntry("Airport modified with id " + id)); -- service hozzáadva
             // logEntryService.createLog("Airport modified with id " + id); -inkább a service update legyen felelős érte, h a logot lementse

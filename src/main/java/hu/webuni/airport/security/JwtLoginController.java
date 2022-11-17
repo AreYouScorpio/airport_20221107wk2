@@ -1,6 +1,7 @@
 package hu.webuni.airport.security;
 
-import hu.webuni.airport.dto.LoginDto;
+import hu.webuni.airport.api.model.LoginDto;
+import hu.webuni.airport.api.model.LoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

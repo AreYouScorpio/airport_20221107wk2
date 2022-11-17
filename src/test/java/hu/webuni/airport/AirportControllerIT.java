@@ -1,6 +1,7 @@
 package hu.webuni.airport;
 
-import hu.webuni.airport.dto.AirportDto;
+import hu.webuni.airport.api.model.AirportDto;
+import hu.webuni.airport.api.model.AirportDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,11 +28,18 @@ public class AirportControllerIT {
         List<AirportDto> airportsBefore = getAllAirports();
         //AirportDto newAirport = new AirportDto(5, "jdlksj" , "IGH");
         //AirportDto @Builder annotacioval keszitve ehelyett:
-        AirportDto newAirport = AirportDto.builder()
-                        .id(5)
+
+//      generated Dto-kon nincsen Build annotacio, itt siman lehet buildelni, emiatt cserelni kellett open api generator utan
+//        AirportDto newAirport = AirportDto.builder()
+//                        .id(5)
+//                        .name("jdlksj")
+//                        .iata("IGH")
+//                        .build();
+
+        AirportDto newAirport = new AirportDto()
+                        .id(5L)
                         .name("jdlksj")
-                        .iata("IGH")
-                        .build();
+                        .iata("IGH");
 
         createAirport(newAirport);
 
