@@ -5,26 +5,22 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import hu.webuni.airport.api.model.FlightDto;
-import hu.webuni.airport.model.QFlight;
 import hu.webuni.airport.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.web.bind.annotation.*;
 
-import hu.webuni.airport.api.model.FlightDto;
 import hu.webuni.airport.mapper.FlightMapper;
 import hu.webuni.airport.model.Flight;
 import hu.webuni.airport.service.FlightService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-@RestController
+//@RestController .. ne legyen utkozes, kikapcsoljuk
 @RequestMapping("/api/flights")
-public class FlightController {
+public class _old_FlightController {
 
     @Autowired
     FlightService flightService;
