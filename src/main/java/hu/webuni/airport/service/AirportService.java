@@ -280,7 +280,7 @@ public class AirportService {
                     DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) objArray[1];
                     Airport airport = (Airport) objArray[0];
                     Address address = airport.getAddress();
-                    if (address!=null) System.out.println(airport.getAddress().getCity()); //airport.getAddress() onmagaban nem kenyszeriti ki a kapcs betoltest, csak ha meg vmit meghivok rajta, pl getCity
+                    if (address!=null) System.out.println(airport.getAddress().getCity()); //airport.getAddress() onmagaban nem kenyszeriti ki a kapcs betoltest, csak ha meg vmit meghivok rajta, pl getCity  .. kesobb modositva, h cityt csak akkor hivjon, ha van is address
                     System.out.println(airport.getArrivals().size()); //szinten vmit csin kell vele, pl lekerdezem a meretet
                     System.out.println(airport.getDepartures().size());
                     return new HistoryData<Airport>(

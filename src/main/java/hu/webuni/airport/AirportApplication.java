@@ -1,6 +1,7 @@
 package hu.webuni.airport;
 
 import hu.webuni.airport.service.*;
+import hu.webuni.airport.web.LychrelNumberTest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -43,6 +44,14 @@ public class AirportApplication implements CommandLineRunner{
 		initDbService.deleteDb();
 		initDbService.deleteAudTables();
 		initDbService.addInitData();
+
+
+//		LychrelNumberTest lychrelNumberTest = new LychrelNumberTest();
+//
+//		long number = 295;
+//		System.out.println(number + " is lychrel? "
+//				+ isLychrel(number));
+
 	}
 
 
