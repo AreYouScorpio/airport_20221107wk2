@@ -279,7 +279,8 @@ public class AirportService {
                     Object[] objArray = (Object[])o; // castoljuk az object tombre
                     DefaultRevisionEntity revisionEntity = (DefaultRevisionEntity) objArray[1];
                     Airport airport = (Airport) objArray[0];
-                    System.out.println(airport.getAddress().getCity()); //airport.getAddress() onmagaban nem kenyszeriti ki a kapcs betoltest, csak ha meg vmit meghivok rajta, pl getCity
+                    Address address = airport.getAddress();
+                    if (address!=null) System.out.println(airport.getAddress().getCity()); //airport.getAddress() onmagaban nem kenyszeriti ki a kapcs betoltest, csak ha meg vmit meghivok rajta, pl getCity
                     System.out.println(airport.getArrivals().size()); //szinten vmit csin kell vele, pl lekerdezem a meretet
                     System.out.println(airport.getDepartures().size());
                     return new HistoryData<Airport>(
