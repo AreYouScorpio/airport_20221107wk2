@@ -2,7 +2,9 @@ package hu.webuni.airport.web;
 
 import java.util.Arrays;
 
-
+// vizsgafeladat
+// legrovidebb ut algoritmus
+// https://www.studytonight.com/java-examples/dijkstras-algorithm-in-java
 public class Graph
 {
     int[][] adjMatrix;
