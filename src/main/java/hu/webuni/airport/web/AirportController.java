@@ -58,8 +58,10 @@ public class AirportController implements AirportControllerApi {
 
     @Override
     public ResponseEntity<List<HistoryDataAirportDto>> getHistoryById(Long id) {
-        Airport airport = airportService.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        // ki kell szedni a history miatt, kulonben a DEL history nem latszik, m ertelemszeruen nem lesz ilyen ID, ami mar torolt, mikozben a historyban ugye kell, h legyen..
+       // Airport airport = airportService.findById(id)
+         //       .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         List<HistoryData<Airport>> airports = airportService.getAirportHistory(id);
 
         //ezt is ResponsEntity-be:
