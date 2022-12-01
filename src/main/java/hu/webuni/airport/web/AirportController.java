@@ -49,7 +49,7 @@ public class AirportController implements AirportControllerApi {
     }
 
     @Override
-    public ResponseEntity<List<AirportDto>> getAll(Boolean full, Integer page, Integer size, String sort) {
+    public ResponseEntity<List<AirportDto>> getAll(Boolean full, Integer page, Integer size, List<String> sort) {
 
         // Optional bool helyett Boolean van, emiatt ezt valtoztatni:
 //        boolean isFull = full.orElse(false);
